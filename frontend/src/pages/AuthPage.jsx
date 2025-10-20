@@ -9,8 +9,8 @@ import './AuthPage.css';
 export default function AuthPage() {
   const navigate = useNavigate();
   const [mode, setMode] = useState('login');
-  const [email, setEmail] = useState('demo@goalflow.dev');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -60,7 +60,7 @@ export default function AuthPage() {
             {mode === 'login' ? 'Войти в focusloop' : 'Создать аккаунт'}
           </h1>
           <p className="auth-subtitle">
-            Используйте демо аккаунт demo@goalflow.dev / password123 или создайте свой.
+            Введите данные для входа или создайте новый аккаунт.
           </p>
 
           {error && <div className="auth-error">{error}</div>}
