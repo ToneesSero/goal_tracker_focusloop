@@ -11,9 +11,14 @@ export const authService = {
   },
 
   async login(email, password) {
-    const response = await api.post('/api/auth/login', {
-      email,
-      password,
+    const formData = new URLSearchParams();
+    formData.append('username', email);
+    formData.append('password', password);
+
+    const response = await api.post('/api/auth/login', formData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
     });
     const { access_token } = response.data;
     localStorage.setItem('token', access_token);
