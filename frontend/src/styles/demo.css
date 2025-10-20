@@ -1,0 +1,60 @@
+.demo-page {
+  padding: 2rem;
+}
+
+.demo-title {
+  color: var(--color-cyan-500);
+  margin-bottom: 2rem;
+}
+
+.demo-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 600px;
+}
+
+.demo-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.demo-button-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.demo-input-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.demo-donut-row {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.demo-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.demo-nav-link {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-slate-200);
+  transition: border-color var(--transition-base);
+}
+
+.demo-nav-link:hover {
+  border-color: var(--color-cyan-300);
+}
+
+.main-content {
+  padding: 2rem;
+}

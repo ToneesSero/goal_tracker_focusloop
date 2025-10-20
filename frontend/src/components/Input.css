@@ -1,0 +1,13 @@
+.input-required {
+  color: var(--color-red-600);
+  margin-left: 0.125rem;
+}
+
+.input-error-text {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--color-red-600);
+  margin-top: 0.25rem;
+}

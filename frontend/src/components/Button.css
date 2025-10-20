@@ -1,0 +1,16 @@
+.btn {
+  /* Уже есть базовые стили в components.css */
+  /* Добавим дополнительные */
+}
+
+.btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn-icon-left,
+.btn-icon-right {
+  display: inline-flex;
+  align-items: center;
+}
