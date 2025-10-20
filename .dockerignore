@@ -1,0 +1,20 @@
+# Frontend
+frontend/node_modules
+frontend/dist
+frontend/.env.local
+frontend/.git
+
+# Backend
+backend/__pycache__
+backend/*.pyc
+backend/.env
+backend/.venv
+backend/.git
+
+# Root
+.git
+.gitignore
+README.md
+.env
+.env.*
+backups/
