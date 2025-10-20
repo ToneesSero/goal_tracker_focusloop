@@ -11,7 +11,7 @@ from app.models.goal import Goal
 from app.models.user import User
 from app.schemas.stats import ActivityPoint, FastestGoal, Streaks, UserStatsResponse
 
-router = APIRouter(prefix="/api/stats", tags=["stats"])
+router = APIRouter(prefix="/stats", tags=["stats"])
 
 
 def calculate_streaks(checkins: List[CheckIn]) -> Streaks:

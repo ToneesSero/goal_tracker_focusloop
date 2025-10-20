@@ -13,7 +13,7 @@ from app.models.user import User
 from app.schemas.goal import GoalCreate, GoalResponse, GoalUpdate, ProgressUpdate
 from app.schemas.history import GoalHistoryResponse, HistoryEntry
 
-router = APIRouter(prefix="/api/goals", tags=["goals"])
+router = APIRouter(prefix="/goals", tags=["goals"])
 
 
 def create_checkin(db: Session, user_id, today: date_type):
