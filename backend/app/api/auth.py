@@ -1,6 +1,8 @@
 from datetime import timedelta
+from typing import Dict, Any
 
-from fastapi import APIRouter, Depends, Form, HTTPException, status
+from fastapi import APIRouter, Depends, Form, HTTPException, status, Body
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.core.security import (
@@ -9,6 +11,8 @@ from app.core.security import (
     get_current_user,
     get_password_hash,
     verify_password,
+    verify_telegram_auth,
+    verify_telegram_web_app_data,
 )
 from app.database import get_db
 from app.models.user import User
@@ -82,3 +86,119 @@ def login(form_data: LoginForm = Depends(), db: Session = Depends(get_db)):
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user: User = Depends(get_current_user)):
     return current_user
+
+
+class TelegramAuthData(BaseModel):
+    id: int
+    first_name: str
+    last_name: str | None = None
+    username: str | None = None
+    photo_url: str | None = None
+    auth_date: int
+    hash: str
+
+
+@router.post("/telegram", response_model=Token)
+def telegram_login(auth_data: TelegramAuthData, db: Session = Depends(get_db)):
+    """
+    Authenticate user via Telegram Login Widget
+    """
+    # Convert to dict for verification
+    auth_dict = auth_data.model_dump(exclude_none=True)
+
+    # Verify Telegram data
+    if not verify_telegram_auth(auth_dict):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Telegram authentication data"
+        )
+
+    # Find or create user
+    user = db.query(User).filter(User.telegram_id == auth_data.id).first()
+
+    if not user:
+        # Create new user
+        name = auth_data.first_name
+        if auth_data.last_name:
+            name += f" {auth_data.last_name}"
+
+        user = User(
+            telegram_id=auth_data.id,
+            name=name,
+            email=None,
+            hashed_password=None
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+    # Create access token with 36 hours expiration
+    access_token_expires = timedelta(hours=36)
+    access_token = create_access_token(
+        data={"sub": str(user.id)},
+        expires_delta=access_token_expires
+    )
+
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
+class TelegramWebAppData(BaseModel):
+    initData: str
+
+
+@router.post("/telegram-miniapp", response_model=Token)
+def telegram_miniapp_login(data: TelegramWebAppData, db: Session = Depends(get_db)):
+    """
+    Authenticate user via Telegram Mini App
+    """
+    # Verify Telegram Web App data
+    verified_data = verify_telegram_web_app_data(data.initData)
+
+    if not verified_data:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Telegram Mini App data"
+        )
+
+    # Extract user data
+    user_data = verified_data.get('user')
+    if not user_data:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User data not found in initData"
+        )
+
+    telegram_id = user_data.get('id')
+    if not telegram_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Telegram ID not found"
+        )
+
+    # Find or create user
+    user = db.query(User).filter(User.telegram_id == telegram_id).first()
+
+    if not user:
+        # Create new user
+        first_name = user_data.get('first_name', 'User')
+        last_name = user_data.get('last_name', '')
+        name = f"{first_name} {last_name}".strip()
+
+        user = User(
+            telegram_id=telegram_id,
+            name=name,
+            email=None,
+            hashed_password=None
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+    # Create access token with 36 hours expiration
+    access_token_expires = timedelta(hours=36)
+    access_token = create_access_token(
+        data={"sub": str(user.id)},
+        expires_delta=access_token_expires
+    )
+
+    return {"access_token": access_token, "token_type": "bearer"}

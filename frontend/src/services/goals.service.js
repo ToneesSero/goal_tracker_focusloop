@@ -7,31 +7,31 @@ export const goalsService = {
     if (filters.color) params.append('color', filters.color);
     if (filters.sort) params.append('sort', filters.sort);
 
-    const response = await api.get(`/api/goals?${params.toString()}`);
+    const response = await api.get(`/goals?${params.toString()}`);
     return response.data;
   },
 
   async createGoal(goalData) {
-    const response = await api.post('/api/goals', goalData);
+    const response = await api.post('/goals', goalData);
     return response.data;
   },
 
   async getGoal(id) {
-    const response = await api.get(`/api/goals/${id}`);
+    const response = await api.get(`/goals/${id}`);
     return response.data;
   },
 
   async updateGoal(id, updates) {
-    const response = await api.put(`/api/goals/${id}`, updates);
+    const response = await api.put(`/goals/${id}`, updates);
     return response.data;
   },
 
   async deleteGoal(id) {
-    await api.delete(`/api/goals/${id}`);
+    await api.delete(`/goals/${id}`);
   },
 
   async updateProgress(id, delta, note = null) {
-    const response = await api.post(`/api/goals/${id}/progress`, {
+    const response = await api.post(`/goals/${id}/progress`, {
       delta,
       note,
     });
@@ -39,12 +39,12 @@ export const goalsService = {
   },
 
   async completeGoal(id) {
-    const response = await api.post(`/api/goals/${id}/complete`);
+    const response = await api.post(`/goals/${id}/complete`);
     return response.data;
   },
 
   async getHistory(id) {
-    const response = await api.get(`/api/goals/${id}/history`);
+    const response = await api.get(`/goals/${id}/history`);
     return response.data;
   },
 };

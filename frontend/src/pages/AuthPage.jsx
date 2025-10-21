@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Button from '../components/Button';
 import Input from '../components/Input';
+import TelegramLoginButton from '../components/TelegramLoginButton';
 import { authService } from '../services/auth.service';
 import './AuthPage.css';
 
@@ -22,17 +23,33 @@ export default function AuthPage() {
     try {
       if (mode === 'login') {
         await authService.login(email, password);
+        navigate('/goals');
       } else {
         await authService.register(email, password, name || 'User');
+        // After successful registration, login automatically
         await authService.login(email, password);
+        navigate('/goals');
       }
-      navigate('/goals');
     } catch (err) {
       setError(err.response?.data?.detail || 'Не удалось выполнить запрос');
     } finally {
       setLoading(false);
     }
   };
+
+  // Memoize Telegram auth handler to prevent button re-renders
+  const handleTelegramAuth = useCallback(async (user) => {
+    setLoading(true);
+    setError('');
+    try {
+      await authService.telegramLogin(user);
+      navigate('/goals');
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Не удалось войти через Telegram');
+    } finally {
+      setLoading(false);
+    }
+  }, [navigate]);
 
   return (
     <div className="auth-page">
@@ -64,6 +81,17 @@ export default function AuthPage() {
           </p>
 
           {error && <div className="auth-error">{error}</div>}
+
+          <div className="telegram-auth-section">
+            <TelegramLoginButton
+              botUsername={import.meta.env.VITE_TELEGRAM_BOT_USERNAME || 'focusloop_goal_bot'}
+              onAuth={handleTelegramAuth}
+              buttonSize="large"
+            />
+            <div className="auth-divider">
+              <span>или</span>
+            </div>
+          </div>
 
           <form onSubmit={handleSubmit} className="auth-form">
             {mode === 'register' && (

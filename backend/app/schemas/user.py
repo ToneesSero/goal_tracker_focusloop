@@ -1,5 +1,6 @@
 from datetime import datetime
 from uuid import UUID
+from typing import Optional
 
 from pydantic import BaseModel, EmailStr
 
@@ -17,8 +18,9 @@ class UserLogin(BaseModel):
 
 class UserResponse(BaseModel):
     id: UUID
-    email: str
+    email: Optional[str] = None
     name: str
+    telegram_id: Optional[int] = None
     created_at: datetime
 
     class Config:
